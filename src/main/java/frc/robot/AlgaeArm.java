@@ -1,68 +1,68 @@
 package frc.robot;
 
-import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
-import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 
 public class AlgaeArm {
-    public static final double P = 0.1;
-    public static final double I = 0;
-    public static final double D = 0.01;
-    public static final double gravityForce = 9.81;
-    public static final double maxPos=1, minPos=-1;
-
+    private static final double antiGravity = 0.15;
+    private static final double maxPos=Math.PI/2, minPos=0.18;
+    private static final double rad2Enc = 1/0.695;
+    // 8.75:1 gear ratio
 
     private SparkMax armPosMotor;
     SparkClosedLoopController armAuto;
     RelativeEncoder armEncoder;
-    SparkMaxConfig configSM = new SparkMaxConfig();
+    SparkMaxConfig configSM;
+
+    private boolean stowed = false;
 
     public AlgaeArm() {
-        configSM.smartCurrentLimit(50).idleMode(IdleMode.kBrake);
-        armPosMotor.configure(configSM, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        armPosMotor = new SparkMax(9, MotorType.kBrushless);
+        armPosMotor = new SparkMax(7, MotorType.kBrushless);
         armAuto = armPosMotor.getClosedLoopController();
         armEncoder = armPosMotor.getEncoder();
 
-        configSM.encoder.positionConversionFactor(0);
-        configSM.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-        .p(P)
-        .i(I)
-        .d(D)
-        .outputRange(-1, 1)
-        ;
-
+        if (!stowed) armEncoder.setPosition(radToEnc(minPos));
+        else armEncoder.setPosition(radToEnc(maxPos));
+        
+        configSM = new SparkMaxConfig();
+        configSM.smartCurrentLimit(50).idleMode(IdleMode.kBrake);
+        
+        configSM.encoder.positionConversionFactor(1);
         armPosMotor.configure(configSM, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
 
-    public void movePID(double target) {
-        armAuto.setReference(target, ControlType.kPosition, ClosedLoopSlot.kSlot0);
+    private double encToRad(double enc) {
+        return enc*0.695;
     }
 
-    public void deployArm(double input) {
-        // armPosMotor.set(input*0.6);
+    private double radToEnc(double rad) {
+        return rad*rad2Enc;
     }
 
-    public void stowArm(double input) {
-        // double slowStow = armEncoder.getPosition() - 
+    private void deployArm() {
+        if (armEncoder.getPosition()>=radToEnc(minPos)+0.2) {
+            armPosMotor.set(-0.05 + (antiGravity*Math.cos(encToRad(armEncoder.getPosition()))));
+        } else armPosMotor.set(0);
     }
 
-    public void moveArm(double input) {
-        // remember! getPostion() returns num of motor rotations, not the angle.
-        if (armEncoder.getPosition()>=maxPos) {
-            if (input<=0) armPosMotor.set(input);
-        } else if (armEncoder.getPosition()<=minPos) {
-            if (input>=0) armPosMotor.set(input);
-        } else {
-            armPosMotor.set(input + (gravityForce*Math.cos(armEncoder.getPosition())));
-        }
+    private void stowArm() {
+        if (armEncoder.getPosition()<=radToEnc(maxPos)-0.2) {
+            armPosMotor.set(0.05 + (antiGravity*Math.cos(encToRad(armEncoder.getPosition()))));
+        } else armPosMotor.set(0);
+    }
+
+    public void setStowed(boolean newStow) {
+        stowed = newStow;
+    }
+
+    public void runArm() {
+        if (stowed) stowArm();
+        else deployArm();
     }
 }

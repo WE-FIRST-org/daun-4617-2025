@@ -8,8 +8,6 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
-import edu.wpi.first.wpilibj.Timer;
-
 // auto imports
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkClosedLoopController;
@@ -18,12 +16,12 @@ import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 
 public class Drivetrain {
-    public static final double RATIO = 8.45;
-    public static final double WHEEL = 6 * Math.PI;
-    public static final double IN2ENC = RATIO / WHEEL;
-    public static final double P = 0.1;
-    public static final double I = 0;
-    public static final double D = 0.01;
+    private static final double RATIO = 8.45;
+    private static final double WHEEL = 6 * Math.PI;
+    private static final double IN2ENC = RATIO / WHEEL;
+    private static final double P = 0.05;
+    private static final double I = 0;
+    private static final double D = 0;
 
     private SparkMax rightMotor1, rightMotor2, leftMotor1, leftMotor2;
     SparkMaxConfig globalConfig = new SparkMaxConfig();
@@ -61,7 +59,7 @@ public class Drivetrain {
         rEncoder = rightMotor1.getEncoder();
         lEncoder = leftMotor1.getEncoder();
 
-        globalConfig.smartCurrentLimit(50).idleMode(IdleMode.kBrake);
+        globalConfig.smartCurrentLimit(50).idleMode(IdleMode.kBrake).closedLoopRampRate(1);
         rightMotor1Config.apply(globalConfig).inverted(true);
         rightMotor2Config.apply(globalConfig).inverted(true).follow(rightMotor1);
         leftMotor1Config.apply(globalConfig);

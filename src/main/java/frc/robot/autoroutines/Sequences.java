@@ -16,12 +16,8 @@ public class Sequences {
     public void run() {
         this.actionComplete = false;
 
-        if (this.actionStep == this.numberOfActions) {
-            return;
-        }
-
         this.actionComplete = this.actionArray[this.actionStep].run();
-        if (this.actionComplete) {
+        if (this.actionComplete && this.actionStep < this.numberOfActions-1) {
             this.actionStep++;
         }
     }

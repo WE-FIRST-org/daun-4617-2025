@@ -10,13 +10,12 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 // import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.XboxController;
 
 /**
- * The methods in this class are called automatically corresponding to each
+ * The methods in this cla`ss are called automatically corresponding to each
  * mode, as described in
  * the TimedRobot documentation. If you change the name of this class or the
  * package after creating
@@ -26,15 +25,12 @@ public class Robot extends TimedRobot {
   XboxController driver, operator;
   Drivetrain drivetrain;
   AlgaeIntake algaeIntake;
+  AlgaeArm algaeArm;
   // int autoTask = 1;
   double throttle, steer;
 
-  Action[] actions = {
-    new MoveAction(5 * Math.PI, Math.PI / 2, drivetrain),
-    new MoveAction(10 * Math.PI, 0, drivetrain)
-  };
-
-  Sequences sequence1 = new Sequences(actions);
+  Action[] testActions;
+  Sequences testSequence;
 
   private static final String kDefaultAuto = "Default";
   private static final String kCustomAuto = "My Auto";
@@ -58,7 +54,13 @@ public class Robot extends TimedRobot {
     operator = new XboxController(1);
     drivetrain = new Drivetrain();
     algaeIntake = new AlgaeIntake();
-    
+    algaeArm = new AlgaeArm();
+
+    testActions = new Action[] {
+      //new MoveAction(15, Math.PI/8, drivetrain),
+      new MoveAction(25, 0, drivetrain)
+    };
+    testSequence = new Sequences(testActions);
 
     m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
     m_chooser.addOption("My Auto", kCustomAuto);
@@ -112,22 +114,10 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousPeriodic() {
-    sequence1.run();
-
-    // switch (autoTask) {
-    // case 1:
-    // atTarget = action1.run();
-    // break;
-    // case 2:
-    // atTarget = action2.run();
-    // break;
-    // default:
-    // break;
-    // }
-    // if (atTarget) {
-    // autoTask++;
-    // }
-
+    // testSequence.run();
+    testActions[0].run();
+    // drivetrain.driveAuto(25, 25);
+    
     switch (m_autoSelected) {
       case kCustomAuto:
         // Put custom auto code here
@@ -156,6 +146,7 @@ public class Robot extends TimedRobot {
     drivetrain.drive(throttle, steer);
 
     // operator code
+    // algae intake
     if (operator.getAButtonPressed()) {
       if (operator.getBButton()) {
         algaeIntake.reverseIntake();
@@ -168,6 +159,11 @@ public class Robot extends TimedRobot {
     if (operator.getAButton()) {
       algaeIntake.checkIntake();
     }
+
+    // algae arm
+    if (operator.getYButtonPressed()) algaeArm.setStowed(true);
+    if (operator.getXButtonPressed()) algaeArm.setStowed(false);
+    algaeArm.runArm();
   }
 
   /** This function is called once when the robot is disabled. */

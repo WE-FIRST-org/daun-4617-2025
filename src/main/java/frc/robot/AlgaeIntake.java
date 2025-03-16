@@ -1,12 +1,10 @@
 package frc.robot;
 
 import com.revrobotics.spark.SparkFlex;
-import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkFlexConfig;
-import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;;
 
 public class AlgaeIntake {
@@ -22,7 +20,7 @@ public class AlgaeIntake {
     }
 
     public void startIntake() {
-        intakeMotor.set(0.3);
+        intakeMotor.set(0.1);
         startPrime = false;
     }
 
@@ -39,7 +37,7 @@ public class AlgaeIntake {
         intakeMotor.set(0);
     }
     public void reverseIntake() {
-        intakeMotor.set(-0.3);
+        intakeMotor.set(-0.1);
     }
     
 
