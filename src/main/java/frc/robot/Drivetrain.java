@@ -55,7 +55,7 @@ public class Drivetrain {
         leftMotor1 = new SparkMax(1, MotorType.kBrushless);
         leftMotor2 = new SparkMax(3, MotorType.kBrushless);
 
-        // auto motors
+        // auto controllers
         rAuto = rightMotor1.getClosedLoopController();
         lAuto = leftMotor1.getClosedLoopController();
         rEncoder = rightMotor1.getEncoder();

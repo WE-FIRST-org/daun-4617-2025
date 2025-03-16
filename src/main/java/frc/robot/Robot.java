@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import frc.robot.autoroutines.*;
+
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 // import edu.wpi.first.wpilibj.Joystick;
@@ -24,15 +26,21 @@ public class Robot extends TimedRobot {
   XboxController driver, operator;
   Drivetrain drivetrain;
   AlgaeIntake algaeIntake;
-  int autoTask = 1;
-  boolean atTarget;
+  // int autoTask = 1;
   double throttle, steer;
+
+  Action[] actions = {
+    new MoveAction(5 * Math.PI, Math.PI / 2, drivetrain),
+    new MoveAction(10 * Math.PI, 0, drivetrain)
+  };
+
+  Sequences sequence1 = new Sequences(actions);
 
   private static final String kDefaultAuto = "Default";
   private static final String kCustomAuto = "My Auto";
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
-
+  
   private double joystickDeadband(double input) {
     if (input * input < 0.001) {
       return 0.0;
@@ -50,6 +58,7 @@ public class Robot extends TimedRobot {
     operator = new XboxController(1);
     drivetrain = new Drivetrain();
     algaeIntake = new AlgaeIntake();
+    
 
     m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
     m_chooser.addOption("My Auto", kCustomAuto);
@@ -97,27 +106,27 @@ public class Robot extends TimedRobot {
     // m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
     System.out.println("Auto selected: " + m_autoSelected);
   }
+
   /** This function is called periodically during autonomous. */
+ 
+
   @Override
   public void autonomousPeriodic() {
-    atTarget = false;
+    sequence1.run();
 
-    switch (autoTask) {
-      case 1:
-        atTarget = drivetrain.driveAuto(12, 12);
-        break;
-      case 2:
-        atTarget = drivetrain.driveAuto(20*Math.PI,-20*Math.PI);
-        break;
-      default:
-        break;
-    }
-    if (atTarget) {
-      autoTask++;
-    }
-
-
-    
+    // switch (autoTask) {
+    // case 1:
+    // atTarget = action1.run();
+    // break;
+    // case 2:
+    // atTarget = action2.run();
+    // break;
+    // default:
+    // break;
+    // }
+    // if (atTarget) {
+    // autoTask++;
+    // }
 
     switch (m_autoSelected) {
       case kCustomAuto:
@@ -147,13 +156,13 @@ public class Robot extends TimedRobot {
     drivetrain.drive(throttle, steer);
 
     // operator code
-    if (operator.getAButtonPressed()){
-      if (operator.getBButton()){
+    if (operator.getAButtonPressed()) {
+      if (operator.getBButton()) {
         algaeIntake.reverseIntake();
       } else {
         algaeIntake.startIntake();
-      } 
-    } else if (operator.getAButtonReleased()){
+      }
+    } else if (operator.getAButtonReleased()) {
       algaeIntake.stopIntake();
     }
     if (operator.getAButton()) {

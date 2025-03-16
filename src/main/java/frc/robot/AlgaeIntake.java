@@ -11,19 +11,14 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;;
 
 public class AlgaeIntake {
     private SparkFlex intakeMotor;
-    private SparkMax armPosMotor;
-    SparkFlexConfig config = new SparkFlexConfig();
-    SparkMaxConfig configSM = new SparkMaxConfig();
+    SparkFlexConfig configF = new SparkFlexConfig();
     private boolean startPrime = false;
 
 
     public AlgaeIntake() {
         intakeMotor = new SparkFlex(5, MotorType.kBrushless);
-        config.smartCurrentLimit(50).idleMode(IdleMode.kBrake);
-        intakeMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters
-        );
-        //armPosMotor.configure(configSM, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters
-        //);
+        configF.smartCurrentLimit(50).idleMode(IdleMode.kBrake);
+        intakeMotor.configure(configF, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
 
     public void startIntake() {
@@ -46,9 +41,6 @@ public class AlgaeIntake {
     public void reverseIntake() {
         intakeMotor.set(-0.3);
     }
-    public void armPosition(double input) {
-        armPosMotor.set(input);
-
-    }
+    
 
 }
