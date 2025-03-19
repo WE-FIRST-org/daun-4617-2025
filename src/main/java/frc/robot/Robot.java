@@ -147,6 +147,9 @@ public class Robot extends TimedRobot {
 
     // operator code
     // algae intake
+    // if (operator.getAButtonPressed() && !operator.getBButtonPressed()) algaeIntake.startIntake();
+    // if (operator.getBButtonPressed() && !operator.getAButtonPressed()) algaeIntake.reverseIntake();
+
     if (operator.getAButtonPressed()) {
       if (operator.getBButton()) {
         algaeIntake.reverseIntake();
@@ -156,6 +159,7 @@ public class Robot extends TimedRobot {
     } else if (operator.getAButtonReleased()) {
       algaeIntake.stopIntake();
     }
+
     if (operator.getAButton()) {
       algaeIntake.checkIntake();
     }
