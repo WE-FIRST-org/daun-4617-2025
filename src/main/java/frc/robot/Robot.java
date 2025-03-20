@@ -153,6 +153,7 @@ public class Robot extends TimedRobot {
     steer = 0.25 * joystickDeadband(driver.getRightX() * Math.abs(driver.getRightX()));
 
     drivetrain.setBoost(driver.getAButton());
+    // SmartDashboard.putBoolean("Boost", );
     drivetrain.setBoostFactor(driver.getRightTriggerAxis());
     drivetrain.drive(throttle, steer);
 
