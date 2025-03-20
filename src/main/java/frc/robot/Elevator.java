@@ -1,3 +1,10 @@
+/*
+ * to-do
+ * get gear ratio & figure out how muve elevator moves per rotation
+ * trail & error PID values
+ * get position values for L1, L2, and L3
+ */
+
 package frc.robot;
 
 // teleop imports
@@ -21,6 +28,8 @@ public class Elevator {
     private static final double P = 0.05;
     private static final double I = 0;
     private static final double D = 0;
+
+    String currentLevel = "stowed";
 
     private SparkMax elevatorMotor1;
     private SparkMax elevatorMotor2;
@@ -52,23 +61,27 @@ public class Elevator {
     }
 
     // method needed or not needed?
-    public double inchesToEnc(double inches) {
-        return 1;
-    }
+    // public double inchesToEnc(double inches) {
+    //     return 1;
+    // }
     
     public void stowElevator() {
         elevatorAuto.setReference(0, ControlType.kPosition, ClosedLoopSlot.kSlot0);
+        currentLevel = "stowed";
     }
 
     public void L1() {
         elevatorAuto.setReference(1, ControlType.kPosition, ClosedLoopSlot.kSlot0);
+        currentLevel = "L1";
     }
 
     public void L2() {
         elevatorAuto.setReference(2, ControlType.kPosition, ClosedLoopSlot.kSlot0);
+        currentLevel = "L2";
     }
 
     public void L3() {
         elevatorAuto.setReference(3, ControlType.kPosition, ClosedLoopSlot.kSlot0);
+        currentLevel = "L3";
     }
 }

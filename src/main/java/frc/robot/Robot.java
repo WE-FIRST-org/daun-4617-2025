@@ -152,7 +152,7 @@ public class Robot extends TimedRobot {
     throttle = joystickDeadband(-(driver.getLeftY()) * Math.abs(driver.getLeftY()));
     steer = 0.25 * joystickDeadband(driver.getRightX() * Math.abs(driver.getRightX()));
 
-    drivetrain.setBoost(driver.getAButton());
+    drivetrain.setBoost(driver.getAButtonPressed());
     SmartDashboard.putBoolean("Boost", drivetrain.boost);
     drivetrain.setBoostFactor(driver.getRightTriggerAxis());
     drivetrain.drive(throttle, steer);
@@ -176,12 +176,19 @@ public class Robot extends TimedRobot {
     // algae arm
     if (operator.getYButtonPressed()) algaeArm.setStowed(true);
     if (operator.getXButtonPressed()) algaeArm.setStowed(false);
+    SmartDashboard.putBoolean("Arm Stowed", algaeArm.getStowed());
     algaeArm.runArm();
 
     // elevator
-    if (operator.getBackButtonPressed()) elevator.L1();
-    if (operator.getStartButtonPressed()) elevator.L2();
-    if (operator.getBackButtonPressed() && operator.getStartButtonPressed()) elevator.L3();
+    if (operator.getPOV() == 180) elevator.L1();
+    if (operator.getPOV() == 270) elevator.L2();
+    if (operator.getPOV() == 0) elevator.L3();
+    SmartDashboard.putString("Elevator Level", elevator.currentLevel);
+
+    // backup elevator version
+    // if (operator.getBackButtonPressed()) elevator.L1();
+    // if (operator.getStartButtonPressed()) elevator.L2();
+    // if (operator.getBackButtonPressed() && operator.getStartButtonPressed()) elevator.L3();
 
     // coral intake
     if (operator.getRightBumperButtonPressed()) coralIntake.startIntake();
