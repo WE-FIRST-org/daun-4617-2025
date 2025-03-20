@@ -116,6 +116,10 @@ public class Drivetrain {
             ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
 
+    // public void getBoost() {
+    //     return this.boost;
+    // }
+
     public void setBoost(boolean newBoost) {
         if (newBoost) this.boost=!this.boost;
         // this.boost = newBoost;
