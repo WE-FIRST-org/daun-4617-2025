@@ -61,6 +61,10 @@ public class AlgaeArm {
         stowed = newStow;
     }
 
+    public boolean getStowed() {
+        return this.stowed;
+    }
+
     public void runArm() {
         if (stowed) stowArm();
         else deployArm();

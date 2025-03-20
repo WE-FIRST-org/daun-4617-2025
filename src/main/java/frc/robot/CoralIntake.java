@@ -22,10 +22,10 @@ public class CoralIntake {
     }
 
     public void startIntake() {
-        coralIntakeMotor1.set(0.2);
+        coralIntakeMotor1.set(0.3);
     }
 
     public void reverseIntake() {
-        coralIntakeMotor1.set(-0.2);
+        coralIntakeMotor1.set(-0.3);
     }
 }
