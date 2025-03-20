@@ -14,10 +14,10 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.ClosedLoopSlot;
-import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
+import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor; // needed or not needed?
 
 public class Elevator {
-    private static final double antiGravity = 0.5;
+    private static final double antiGravity = 0.5; // needed or not needed?
     private static final double P = 0.05;
     private static final double I = 0;
     private static final double D = 0;
@@ -34,6 +34,7 @@ public class Elevator {
 
         elevatorEncoder1 = elevatorMotor1.getEncoder();
         elevatorEncoder2 = elevatorMotor2.getEncoder();
+        elevatorAuto = elevatorMotor1.getClosedLoopController();
 
         configM.smartCurrentLimit(50).idleMode(IdleMode.kBrake);
     
@@ -46,27 +47,28 @@ public class Elevator {
                 .outputRange(-1, 1);
 
     
-                elevatorMotor1.configure(configM, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-                elevatorMotor2.configure(configM.follow(elevatorMotor1), ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        elevatorMotor1.configure(configM, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        elevatorMotor2.configure(configM.follow(elevatorMotor1), ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
 
+    // method needed or not needed?
     public double inchesToEnc(double inches) {
         return 1;
     }
     
     public void stowElevator() {
-
+        elevatorAuto.setReference(0, ControlType.kPosition, ClosedLoopSlot.kSlot0);
     }
 
     public void L1() {
-        // elevatorMotor1.
+        elevatorAuto.setReference(1, ControlType.kPosition, ClosedLoopSlot.kSlot0);
     }
 
     public void L2() {
-
+        elevatorAuto.setReference(2, ControlType.kPosition, ClosedLoopSlot.kSlot0);
     }
 
     public void L3() {
-
+        elevatorAuto.setReference(3, ControlType.kPosition, ClosedLoopSlot.kSlot0);
     }
 }

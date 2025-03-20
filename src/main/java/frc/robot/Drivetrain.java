@@ -22,6 +22,7 @@ public class Drivetrain {
     private static final double P = 0.05;
     private static final double I = 0;
     private static final double D = 0;
+    private static final double BOOSTRATIO = 0.4;
 
     private SparkMax rightMotor1, rightMotor2, leftMotor1, leftMotor2;
     SparkMaxConfig globalConfig = new SparkMaxConfig();
@@ -43,7 +44,8 @@ public class Drivetrain {
     }
 
     DriveTrainMode driveProfile = DriveTrainMode.LINEAR;
-    boolean boost = false;
+    boolean boost = true;
+    double boostFactor = 1;
 
     public Drivetrain() {
         // Right Motors
@@ -115,12 +117,19 @@ public class Drivetrain {
     }
 
     public void setBoost(boolean newBoost) {
-        this.boost = newBoost;
+        if (newBoost) this.boost=!this.boost;
+        // this.boost = newBoost;
     }
 
-    private double applyBoost(double value) {
-        return value * (this.boost ? 1 : 0.6);
+    public void setBoostFactor(double boostValue) {
+        if (this.boost) {
+            this.boostFactor = BOOSTRATIO + ((1. - BOOSTRATIO)*boostValue);
+        } else this.boostFactor = 1;
     }
+
+    // private double applyBoost(double value) {
+    //     return value * (this.boost ? 1 : 1.6);
+    // }
 
     public void setDriveProfile(DriveTrainMode newDriveProfile) {
         this.driveProfile = newDriveProfile;
@@ -129,16 +138,16 @@ public class Drivetrain {
     public void drive(double throttle, double turn) {
         switch (this.driveProfile) {
             case LINEAR:
-                rightMotor1.set(applyBoost(throttle) - turn);
-                leftMotor1.set(applyBoost(throttle) + turn);
+                rightMotor1.set((throttle - turn)*this.boostFactor);
+                leftMotor1.set((throttle + turn)*this.boostFactor);
                 break;
             case QUAD:
-                rightMotor1.set(applyBoost((throttle < 0 ? -1 : 1) * Math.pow(throttle, 2)) - turn);
-                leftMotor1.set(applyBoost((throttle < 0 ? -1 : 1) * Math.pow(throttle, 2)) + turn);
+                rightMotor1.set(((throttle < 0 ? -1 : 1) * Math.pow(throttle, 2) - turn)*this.boostFactor);
+                leftMotor1.set(((throttle < 0 ? -1 : 1) * Math.pow(throttle, 2) + turn)*this.boostFactor);
                 break;
             case CUBIC:
-                rightMotor1.set(applyBoost(Math.pow(throttle, 3)) - turn);
-                leftMotor1.set(applyBoost(Math.pow(throttle, 3)) + turn);
+                rightMotor1.set((Math.pow(throttle, 3) - turn)*this.boostFactor);
+                leftMotor1.set((Math.pow(throttle, 3) + turn)*this.boostFactor);
                 break;
         }
     }
@@ -164,6 +173,5 @@ public class Drivetrain {
             return true;
         }
         return false;
-  
     }
 }
