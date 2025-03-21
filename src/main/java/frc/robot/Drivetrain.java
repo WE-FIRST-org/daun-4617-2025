@@ -44,7 +44,7 @@ public class Drivetrain {
     }
 
     DriveTrainMode driveProfile = DriveTrainMode.LINEAR;
-    boolean boost = true;
+    boolean boostModeOn = true;
     double boostFactor = 1;
 
     public Drivetrain() {
@@ -117,22 +117,22 @@ public class Drivetrain {
     }
 
     // public void getBoost() {
-    //     return this.boost;
+    //     return this.boostModeOn;
     // }
 
     public void setBoost(boolean newBoost) {
-        if (newBoost) this.boost=!this.boost;
-        // this.boost = newBoost;
+        if (newBoost) this.boostModeOn=!this.boostModeOn;
+        // this.boostModeOn = newBoost;
     }
 
     public void setBoostFactor(double boostValue) {
-        if (this.boost) {
+        if (this.boostModeOn) {
             this.boostFactor = BOOSTRATIO + ((1. - BOOSTRATIO)*boostValue);
         } else this.boostFactor = 1;
     }
 
     // private double applyBoost(double value) {
-    //     return value * (this.boost ? 1 : 1.6);
+    //     return value * (this.boostModeOn ? 1 : 1.6);
     // }
 
     public void setDriveProfile(DriveTrainMode newDriveProfile) {

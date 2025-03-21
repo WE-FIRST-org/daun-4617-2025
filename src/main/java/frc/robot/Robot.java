@@ -152,8 +152,8 @@ public class Robot extends TimedRobot {
     throttle = joystickDeadband(-(driver.getLeftY()) * Math.abs(driver.getLeftY()));
     steer = 0.25 * joystickDeadband(driver.getRightX() * Math.abs(driver.getRightX()));
 
-    drivetrain.setBoost(driver.getAButtonPressed());
-    SmartDashboard.putBoolean("Boost", drivetrain.boost);
+    drivetrain.setBoost(driver.getStartButtonPressed());
+    SmartDashboard.putBoolean("Boost", drivetrain.boostModeOn);
     drivetrain.setBoostFactor(driver.getRightTriggerAxis());
     drivetrain.drive(throttle, steer);
 
@@ -184,6 +184,7 @@ public class Robot extends TimedRobot {
     if (operator.getPOV() == 270) elevator.L2();
     if (operator.getPOV() == 0) elevator.L3();
     SmartDashboard.putString("Elevator Level", elevator.currentLevel);
+    SmartDashboard.putNumber("Elevator Enc Pos", elevator.getEncPos());
 
     // backup elevator version
     // if (operator.getBackButtonPressed()) elevator.L1();

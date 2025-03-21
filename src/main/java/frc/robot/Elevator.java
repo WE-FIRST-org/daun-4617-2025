@@ -64,6 +64,10 @@ public class Elevator {
     // public double inchesToEnc(double inches) {
     //     return 1;
     // }
+
+    public double getEncPos() {
+        return elevatorEncoder1.getPosition();
+    }
     
     public void stowElevator() {
         elevatorAuto.setReference(0, ControlType.kPosition, ClosedLoopSlot.kSlot0);
