@@ -1,3 +1,5 @@
+// path planner
+
 package frc.robot;
 
 // teleop imports
@@ -19,10 +21,10 @@ public class Drivetrain {
     private static final double RATIO = 8.45;
     private static final double WHEEL = 6 * Math.PI;
     private static final double IN2ENC = RATIO / WHEEL;
-    private static final double P = 0.05;
+    private static final double P = 0.025;
     private static final double I = 0;
     private static final double D = 0;
-    private static final double BOOSTRATIO = 0.4;
+    private static final double BOOSTRATIO = 0.5;
 
     private SparkMax rightMotor1, rightMotor2, leftMotor1, leftMotor2;
     SparkMaxConfig globalConfig = new SparkMaxConfig();
@@ -43,7 +45,7 @@ public class Drivetrain {
         LINEAR
     }
 
-    DriveTrainMode driveProfile = DriveTrainMode.LINEAR;
+    DriveTrainMode driveProfile = DriveTrainMode.QUAD;
     boolean boostModeOn = true;
     double boostFactor = 1;
 
@@ -178,4 +180,17 @@ public class Drivetrain {
         }
         return false;
     }
+
+    // public boolean driveAuto(double rpmR, double rpmL) {
+    //     rAuto.setReference(rpmR, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
+    //     lAuto.setReference(rpmL, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
+        
+    //     double err = rEncoder.getPosition() - distanceToEnc(rpmR);
+    //     double err2 = lEncoder.getPosition() - distanceToEnc(rpmL);
+
+    //     if (Math.abs(err) <= 1 && Math.abs(err2) <= 1) {
+    //         return true;
+    //     }
+    //     return false;
+    // }
 }

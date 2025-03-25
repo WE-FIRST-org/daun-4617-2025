@@ -11,10 +11,11 @@ public class MoveAction extends Action {
         if (angle == 0) {
             this.rdistance = distance;
             this.ldistance = distance;
+        } else {
+            this.rdistance = ((distance/angle) - HALFWIDTH)*angle;
+            this.ldistance = ((distance/angle) + HALFWIDTH)*angle;
         }
-
-        this.rdistance = ((distance/angle) - HALFWIDTH)*angle;
-        this.ldistance = ((distance/angle) + HALFWIDTH)*angle;
+        
         this.drivetrain = d;
     }
 

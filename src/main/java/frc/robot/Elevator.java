@@ -1,8 +1,11 @@
 /*
  * to-do
- * get gear ratio & figure out how muve elevator moves per rotation
+ * get gear ratio & figure out how move elevator moves per rotation ----->* 3 rotations:1 gear turn
+
  * trail & error PID values
  * get position values for L1, L2, and L3
+ * 
+ * 3 rotations:1 gear turn
  */
 
 package frc.robot;
@@ -24,7 +27,7 @@ import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor; // needed or not needed?
 
 public class Elevator {
-    private static final double antiGravity = 0.5; // needed or not needed?
+    // private static final double antiGravity = 0.5; // needed or not needed?
     private static final double P = 0.05;
     private static final double I = 0;
     private static final double D = 0;
@@ -55,9 +58,8 @@ public class Elevator {
                 .d(D)
                 .outputRange(-1, 1);
 
-    
         elevatorMotor1.configure(configM, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        elevatorMotor2.configure(configM.follow(elevatorMotor1), ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        elevatorMotor2.configure(configM.follow(elevatorMotor1).inverted(true), ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
 
     // method needed or not needed?
