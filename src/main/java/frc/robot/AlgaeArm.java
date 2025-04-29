@@ -11,7 +11,7 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 
 public class AlgaeArm {
     private static final double antiGravity = 0.15;
-    private static final double maxPos=Math.PI/2, minPos=0.18;
+    private static final double maxPos=1.53664, minPos=0.18;
     private static final double rad2Enc = 1/0.695;
     // 8.75:1 gear ratio
 
@@ -20,7 +20,7 @@ public class AlgaeArm {
     RelativeEncoder armEncoder;
     SparkMaxConfig configSM;
 
-    private boolean stowed = false;
+    private boolean stowed = true;
 
     public AlgaeArm() {
         armPosMotor = new SparkMax(7, MotorType.kBrushless);
@@ -46,7 +46,7 @@ public class AlgaeArm {
     }
 
     private void deployArm() {
-        if (armEncoder.getPosition()>=radToEnc(minPos)+0.2) {
+        if (armEncoder.getPosition()>=radToEnc(minPos)+0.3) {
             armPosMotor.set(-0.05 + (antiGravity*Math.cos(encToRad(armEncoder.getPosition()))));
         } else armPosMotor.set(0);
     }
@@ -59,6 +59,10 @@ public class AlgaeArm {
 
     public void setStowed(boolean newStow) {
         stowed = newStow;
+    }
+
+    public boolean getStowed() {
+        return this.stowed;
     }
 
     public void runArm() {

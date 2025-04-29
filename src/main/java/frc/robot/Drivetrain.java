@@ -1,3 +1,5 @@
+// path planner
+
 package frc.robot;
 
 // teleop imports
@@ -19,9 +21,10 @@ public class Drivetrain {
     private static final double RATIO = 8.45;
     private static final double WHEEL = 6 * Math.PI;
     private static final double IN2ENC = RATIO / WHEEL;
-    private static final double P = 0.05;
+    private static final double P = 0.025;
     private static final double I = 0;
     private static final double D = 0;
+    private static final double BOOSTRATIO = 0.5;
 
     private SparkMax rightMotor1, rightMotor2, leftMotor1, leftMotor2;
     SparkMaxConfig globalConfig = new SparkMaxConfig();
@@ -42,8 +45,9 @@ public class Drivetrain {
         LINEAR
     }
 
-    DriveTrainMode driveProfile = DriveTrainMode.LINEAR;
-    boolean boost = false;
+    DriveTrainMode driveProfile = DriveTrainMode.QUAD;
+    boolean boostModeOn = true;
+    double boostFactor = 1;
 
     public Drivetrain() {
         // Right Motors
@@ -114,13 +118,24 @@ public class Drivetrain {
             ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
 
+    // public void getBoost() {
+    //     return this.boostModeOn;
+    // }
+
     public void setBoost(boolean newBoost) {
-        this.boost = newBoost;
+        if (newBoost) this.boostModeOn=!this.boostModeOn;
+        // this.boostModeOn = newBoost;
     }
 
-    private double applyBoost(double value) {
-        return value * (this.boost ? 1 : 0.6);
+    public void setBoostFactor(double boostValue) {
+        if (this.boostModeOn) {
+            this.boostFactor = BOOSTRATIO + ((1. - BOOSTRATIO)*boostValue);
+        } else this.boostFactor = 1;
     }
+
+    // private double applyBoost(double value) {
+    //     return value * (this.boostModeOn ? 1 : 1.6);
+    // }
 
     public void setDriveProfile(DriveTrainMode newDriveProfile) {
         this.driveProfile = newDriveProfile;
@@ -129,16 +144,16 @@ public class Drivetrain {
     public void drive(double throttle, double turn) {
         switch (this.driveProfile) {
             case LINEAR:
-                rightMotor1.set(applyBoost(throttle) - turn);
-                leftMotor1.set(applyBoost(throttle) + turn);
+                rightMotor1.set((throttle - turn)*this.boostFactor);
+                leftMotor1.set((throttle + turn)*this.boostFactor);
                 break;
             case QUAD:
-                rightMotor1.set(applyBoost((throttle < 0 ? -1 : 1) * Math.pow(throttle, 2)) - turn);
-                leftMotor1.set(applyBoost((throttle < 0 ? -1 : 1) * Math.pow(throttle, 2)) + turn);
+                rightMotor1.set(((throttle < 0 ? -1 : 1) * Math.pow(throttle, 2) - turn)*this.boostFactor);
+                leftMotor1.set(((throttle < 0 ? -1 : 1) * Math.pow(throttle, 2) + turn)*this.boostFactor);
                 break;
             case CUBIC:
-                rightMotor1.set(applyBoost(Math.pow(throttle, 3)) - turn);
-                leftMotor1.set(applyBoost(Math.pow(throttle, 3)) + turn);
+                rightMotor1.set((Math.pow(throttle, 3) - turn)*this.boostFactor);
+                leftMotor1.set((Math.pow(throttle, 3) + turn)*this.boostFactor);
                 break;
         }
     }
@@ -164,6 +179,18 @@ public class Drivetrain {
             return true;
         }
         return false;
-  
     }
+
+    // public boolean driveAuto(double rpmR, double rpmL) {
+    //     rAuto.setReference(rpmR, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
+    //     lAuto.setReference(rpmL, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
+        
+    //     double err = rEncoder.getPosition() - distanceToEnc(rpmR);
+    //     double err2 = lEncoder.getPosition() - distanceToEnc(rpmL);
+
+    //     if (Math.abs(err) <= 1 && Math.abs(err2) <= 1) {
+    //         return true;
+    //     }
+    //     return false;
+    // }
 }

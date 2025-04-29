@@ -7,6 +7,8 @@ package frc.robot;
 import frc.robot.autoroutines.*;
 
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+// import edu.wpi.first.wpilibj.Timer;
+
 
 // import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -26,14 +28,20 @@ public class Robot extends TimedRobot {
   Drivetrain drivetrain;
   AlgaeIntake algaeIntake;
   AlgaeArm algaeArm;
+  // Elevator elevator;
+  // CoralIntake coralIntake;
   // int autoTask = 1;
   double throttle, steer;
 
-  Action[] testActions;
-  Sequences testSequence;
-
-  private static final String kDefaultAuto = "Default";
-  private static final String kCustomAuto = "My Auto";
+  // Action[] testActions;
+  // Sequences testSequence;
+  Action[] leaveStartingLineActions;
+  Sequences leaveStartingLineSequence;
+  Action[] troughScoreActions;
+  Sequences troughScoreSequence;
+  
+  private static final String kLeaveStartingLine = "Leave Robot Starting Line";
+  private static final String kNoOtherAutosYet = "No Other Autos Yet!";
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
   
@@ -55,16 +63,30 @@ public class Robot extends TimedRobot {
     drivetrain = new Drivetrain();
     algaeIntake = new AlgaeIntake();
     algaeArm = new AlgaeArm();
+    // elevator = new Elevator();
+    // coralIntake = new CoralIntake();
 
-    testActions = new Action[] {
-      //new MoveAction(15, Math.PI/8, drivetrain),
-      new MoveAction(25, 0, drivetrain)
+    // testActions = new Action[] {
+    //   //new MoveAction(15, Math.PI/8, drivetrain),
+    //   new MoveAction(25, 0, drivetrain)
+    // };
+    // testSequence = new Sequences(testActions);
+    leaveStartingLineActions = new Action[] {
+      new MoveAction(20,0, drivetrain) //24in x 28 1/4in
     };
-    testSequence = new Sequences(testActions);
+    leaveStartingLineSequence = new Sequences(leaveStartingLineActions);
 
-    m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
-    m_chooser.addOption("My Auto", kCustomAuto);
-    SmartDashboard.putData("Auto choices", m_chooser);
+
+    troughScoreActions = new Action[] {
+      new WaitAction(),
+      new MoveAction(106, 0, drivetrain),
+      new CoralAuto(algaeIntake)
+    };
+    troughScoreSequence = new Sequences(troughScoreActions);
+
+    m_chooser.setDefaultOption("Leave Robot Starting Line", kLeaveStartingLine);
+    m_chooser.addOption("No Other Autos Yet", kNoOtherAutosYet);
+    SmartDashboard.putData("Auto Choices", m_chooser);
   }
 
   /**
@@ -105,7 +127,7 @@ public class Robot extends TimedRobot {
     drivetrain.setMode(IdleMode.kBrake);
 
     m_autoSelected = m_chooser.getSelected();
-    // m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
+    // m_autoSelected = SmartDashboard.getString("Auto Selector", kLeaveStartingLine);
     System.out.println("Auto selected: " + m_autoSelected);
   }
 
@@ -115,18 +137,21 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousPeriodic() {
     // testSequence.run();
-    testActions[0].run();
-    // drivetrain.driveAuto(25, 25);
+    // testActions[0].run();
+    // drivetrain.driveAuto(40, 40);
+    // leaveStartingLineSequence.run();
+    troughScoreSequence.run();
+
     
-    switch (m_autoSelected) {
-      case kCustomAuto:
-        // Put custom auto code here
-        break;
-      case kDefaultAuto:
-      default:
-        // Put default auto code here
-        break;
-    }
+    // switch (m_autoSelected) {
+    //   case kNoOtherAutosYet:
+    //     leaveStartingLineSequence.run();
+    //     break;
+    //   case kLeaveStartingLine:
+    //   default:
+    //     leaveStartingLineSequence.run(); 
+    //     break;
+    // }
   }
 
   /** This function is called once when teleop is enabled. */
@@ -140,34 +165,60 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     // driver code
     throttle = joystickDeadband(-(driver.getLeftY()) * Math.abs(driver.getLeftY()));
-    steer = 0.25 * joystickDeadband(driver.getRightX() * Math.abs(driver.getRightX()));
+    steer = 0.5 * joystickDeadband(driver.getRightX() * Math.abs(driver.getRightX()));
 
-    drivetrain.setBoost(driver.getRightBumperButton());
+    drivetrain.setBoost(driver.getStartButtonPressed());
+    SmartDashboard.putBoolean("Boost", drivetrain.boostModeOn);
+    drivetrain.setBoostFactor(driver.getRightTriggerAxis());
     drivetrain.drive(throttle, steer);
 
     // operator code
     // algae intake
-    // if (operator.getAButtonPressed() && !operator.getBButtonPressed()) algaeIntake.startIntake();
-    // if (operator.getBButtonPressed() && !operator.getAButtonPressed()) algaeIntake.reverseIntake();
+    // if (operator.getAButtonPressed()) {
+    //   if (operator.getBButton()) {
+    //     algaeIntake.reverseIntake();
+    //   } else {
+    //     algaeIntake.startIntake();
+    //   }
+    // } else if (operator.getAButtonReleased()) {
+    //   algaeIntake.stopIntake();
+    // }
 
-    if (operator.getAButtonPressed()) {
-      if (operator.getBButton()) {
-        algaeIntake.reverseIntake();
-      } else {
-        algaeIntake.startIntake();
-      }
-    } else if (operator.getAButtonReleased()) {
-      algaeIntake.stopIntake();
-    }
+    // if (operator.getAButton()) {
+    //   algaeIntake.checkIntake();
+    // }
 
-    if (operator.getAButton()) {
+    if (operator.getAButtonPressed()) algaeIntake.startIntake();
+    else if (operator.getAButtonReleased()) algaeIntake.stopIntake();
+
+    if (operator.getBButtonPressed()) algaeIntake.reverseIntake();
+    else if (operator.getBButtonReleased()) algaeIntake.stopIntake();
+
+    if (operator.getAButton() || operator.getBButton()) {
       algaeIntake.checkIntake();
     }
 
     // algae arm
     if (operator.getYButtonPressed()) algaeArm.setStowed(true);
     if (operator.getXButtonPressed()) algaeArm.setStowed(false);
+    SmartDashboard.putBoolean("Arm Stowed", algaeArm.getStowed());
     algaeArm.runArm();
+
+    // elevator
+    // if (operator.getPOV() == 0) elevator.L1();
+    // if (operator.getPOV() == 90) elevator.L2();
+    // if (operator.getPOV() == 180) elevator.L3();
+    // SmartDashboard.putString("Elevator Level", elevator.currentLevel);
+    // SmartDashboard.putNumber("Elevator Enc Pos", elevator.getEncPos());
+
+    // backup elevator version
+    // if (operator.getBackButtonPressed()) elevator.L1();
+    // if (operator.getStartButtonPressed()) elevator.L2();
+    // if (operator.getBackButtonPressed() && operator.getStartButtonPressed()) elevator.L3();
+
+    // // coral intake
+    // if (operator.getRightBumperButtonPressed()) coralIntake.startIntake();
+    // if (operator.getLeftBumperButtonPressed()) coralIntake.reverseIntake();
   }
 
   /** This function is called once when the robot is disabled. */
