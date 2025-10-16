@@ -24,7 +24,7 @@ public class Drivetrain {
     private static final double P = 0.025;
     private static final double I = 0;
     private static final double D = 0;
-    private static final double BOOSTRATIO = 0.5;
+    private static final double BOOSTRATIO = 0.50; //0.5
 
     private SparkMax rightMotor1, rightMotor2, leftMotor1, leftMotor2;
     SparkMaxConfig globalConfig = new SparkMaxConfig();
@@ -51,11 +51,11 @@ public class Drivetrain {
 
     public Drivetrain() {
         // Right Motors
-        rightMotor1 = new SparkMax(2, MotorType.kBrushless);
-        rightMotor2 = new SparkMax(4, MotorType.kBrushless);
+        rightMotor1 = new SparkMax(1, MotorType.kBrushless);
+        rightMotor2 = new SparkMax(3, MotorType.kBrushless);
         // Left Motors
-        leftMotor1 = new SparkMax(1, MotorType.kBrushless);
-        leftMotor2 = new SparkMax(3, MotorType.kBrushless);
+        leftMotor1 = new SparkMax(2, MotorType.kBrushless);
+        leftMotor2 = new SparkMax(4, MotorType.kBrushless);
 
         // auto controllers
         rAuto = rightMotor1.getClosedLoopController();

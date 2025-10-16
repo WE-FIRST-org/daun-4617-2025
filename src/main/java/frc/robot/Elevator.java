@@ -10,56 +10,59 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Volts;
+
+import com.ctre.phoenix6.CANBus;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.DutyCycleOut;
+import com.ctre.phoenix6.controls.Follower;
+import com.ctre.phoenix6.controls.PositionVoltage;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 // teleop imports
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.SparkBase.PersistMode;
-import com.revrobotics.spark.SparkBase.ResetMode;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.config.SparkMaxConfig;
-import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
-// auto imports
-import com.revrobotics.spark.SparkClosedLoopController;
-import com.revrobotics.spark.SparkBase.ControlType;
-import com.revrobotics.spark.ClosedLoopSlot;
-import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor; // needed or not needed?
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj.Timer;
 
 public class Elevator {
-    // private static final double antiGravity = 0.5; // needed or not needed?
-    private static final double P = 0.05;
+    public static final double MAXPOWER = 0.4;
+    public static final double MAXHEIGHT = 1; // NVM
+    public static final double TIMELIMIT = 2; // TODO
+    private static final double P = 1.2;
     private static final double I = 0;
     private static final double D = 0;
+    private static final double L1 = 2;
+    private static final double L2 = 3;
+    private static final double L3 = 4;
 
-    String currentLevel = "stowed";
+    private TalonFX motor =  new TalonFX(20); // LEFT SIDE
+    private TalonFX motorFollower  =  new TalonFX(21); // RIGHT SIDE
+    private DutyCycleOut driveOut = new DutyCycleOut(0);
+    private PositionVoltage posVolt = new PositionVoltage(0).withSlot(0); 
 
-    private SparkMax elevatorMotor1;
-    private SparkMax elevatorMotor2;
-    SparkMaxConfig configM = new SparkMaxConfig();
-    RelativeEncoder elevatorEncoder1, elevatorEncoder2;
-    SparkClosedLoopController elevatorAuto;
+    private double targetPos = 0;
+    private Timer burnoutTimer = new Timer();
+    public String posName = "DOWN";
+    public double tStart = 0;
 
     public Elevator() {
-        elevatorMotor1 = new SparkMax(10, MotorType.kBrushless);
-        elevatorMotor2 = new SparkMax(11, MotorType.kBrushless);
+        TalonFXConfiguration config = new TalonFXConfiguration();
 
-        elevatorEncoder1 = elevatorMotor1.getEncoder();
-        elevatorEncoder2 = elevatorMotor2.getEncoder();
-        elevatorAuto = elevatorMotor1.getClosedLoopController();
+        config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+        config.MotorOutput.NeutralMode  = NeutralModeValue.Brake;
 
-        configM.smartCurrentLimit(50).idleMode(IdleMode.kBrake);
-    
-        configM.encoder.positionConversionFactor(1);
-        configM.closedLoop
-                .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-                .p(P)
-                .i(I)
-                .d(D)
-                .outputRange(-1, 1);
+        config.Slot0.kP = P;
+        config.Slot0.kI = I;
+        config.Slot0.kD = D;
 
-        elevatorMotor1.configure(configM, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        elevatorMotor2.configure(configM.follow(elevatorMotor1).inverted(true), ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        config.Voltage.withPeakForwardVoltage(Volts.of(10)).withPeakReverseVoltage(Volts.of(-10));
+
+        motor.getConfigurator().apply(config);
+        motorFollower.getConfigurator().apply(config);
+
+        motorFollower.setControl(new Follower(motor.getDeviceID(), true));
     }
 
     // method needed or not needed?
@@ -67,27 +70,55 @@ public class Elevator {
     //     return 1;
     // }
 
-    public double getEncPos() {
-        return elevatorEncoder1.getPosition();
-    }
-    
-    public void stowElevator() {
-        elevatorAuto.setReference(0, ControlType.kPosition, ClosedLoopSlot.kSlot0);
-        currentLevel = "stowed";
+    public void run() {
+        if(Timer.getTimestamp() - tStart > TIMELIMIT) {
+            posName = "DOWN";
+
+            if(motor.getPosition().getStatus().value <= 1) {
+                driveOut.Output = 0;
+                motor.setControl(driveOut);
+                return;
+            }
+
+            motor.setControl(posVolt.withPosition(1));
+            return;
+        }
+        
+        motor.setControl(posVolt.withPosition(targetPos));
+    } 
+
+    public void down() {
+        targetPos = 0;
+        driveOut.Output = 0;
+        motor.setControl(driveOut);
     }
 
     public void L1() {
-        elevatorAuto.setReference(1, ControlType.kPosition, ClosedLoopSlot.kSlot0);
-        currentLevel = "L1";
+        tStart = Timer.getTimestamp();
+        targetPos = L1;
+        posName = "L1";
     }
 
     public void L2() {
-        elevatorAuto.setReference(2, ControlType.kPosition, ClosedLoopSlot.kSlot0);
-        currentLevel = "L2";
+        tStart = Timer.getTimestamp();
+        targetPos = L2;
+        posName = "L2";
     }
 
     public void L3() {
-        elevatorAuto.setReference(3, ControlType.kPosition, ClosedLoopSlot.kSlot0);
-        currentLevel = "L3";
+        tStart = Timer.getTimestamp();
+        targetPos = L3;
+        posName = "L3";
     }
-}
+
+    /**
+     * DO NOT USE: RISK OF MOTOR BURNOUT
+
+    public void dumbControl(double power) {
+        power *= MAXPOWER;
+        driveOut.Output = power;
+        motor.setControl(driveOut);
+    }
+    */
+
+    }

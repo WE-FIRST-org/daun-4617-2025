@@ -18,14 +18,20 @@ public class CoralIntake {
         
         configF.smartCurrentLimit(50).idleMode(IdleMode.kBrake);
         coralIntakeMotor1.configure(configF, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        coralIntakeMotor2.configure(configF.inverted(true).follow(coralIntakeMotor1), ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        coralIntakeMotor2.configure(configF.inverted(true), ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
 
     public void startIntake() {
-        coralIntakeMotor1.set(0.3);
+        coralIntakeMotor1.set(.15);
+        coralIntakeMotor2.set(.15);
     }
 
     public void reverseIntake() {
-        coralIntakeMotor1.set(-0.3);
+        coralIntakeMotor1.set(-.15);
+        coralIntakeMotor2.set(-  .15);
+    }
+    public void stopIntake() { 
+        coralIntakeMotor1.set(0);
+        coralIntakeMotor2.set(0);
     }
 }
