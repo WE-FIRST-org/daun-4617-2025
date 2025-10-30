@@ -27,15 +27,16 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.Timer;
 
 public class Elevator {
-    public static final double MAXPOWER = 0.4;
-    public static final double MAXHEIGHT = 1; // NVM
-    public static final double TIMELIMIT = 2; // TODO
+    public static final double MAXPOWER = 0.4; //change to 0.3
+    public static final double MAXHEIGHT = 1; // NVM This variable is not used anywhere
+    public static final double TIMELIMIT = 2; // TO DO
+    public static final double VELOCITYFACTOR = 0.4; // this factor affects how much speed does the motor move
     private static final double P = 1.2;
     private static final double I = 0;
     private static final double D = 0;
-    private static final double L1 = 2;
-    private static final double L2 = 3;
-    private static final double L3 = 4;
+    // private static final double L1 = 2;
+    // private static final double L2 = 3;
+    // private static final double L3 = 4;
 
     private TalonFX motor =  new TalonFX(20); // LEFT SIDE
     private TalonFX motorFollower  =  new TalonFX(21); // RIGHT SIDE
@@ -69,47 +70,61 @@ public class Elevator {
     // public double inchesToEnc(double inches) {
     //     return 1;
     // }
+    
+    /**
+     * Old run() code
+     */
+    // public void run() {
+    //     if(Timer.getTimestamp() - tStart > TIMELIMIT) {;
 
-    public void run() {
-        if(Timer.getTimestamp() - tStart > TIMELIMIT) {
-            posName = "DOWN";
+    //         if(motor.getPosition().getStatus().value <= 1) {
+    //             driveOut.Output = 0;
+    //             motor.setControl(driveOut);
+    //             return;
+    //         }
 
-            if(motor.getPosition().getStatus().value <= 1) {
-                driveOut.Output = 0;
-                motor.setControl(driveOut);
-                return;
-            }
-
-            motor.setControl(posVolt.withPosition(1));
-            return;
-        }
+    //         motor.setControl(posVolt.withPosition(1));
+    //         return;
+    //     }
         
-        motor.setControl(posVolt.withPosition(targetPos));
-    } 
+    //     //motor.setControl(posVolt.withPosition(targetPos));
+    // } 
 
-    public void down() {
-        targetPos = 0;
-        driveOut.Output = 0;
+
+
+    /**
+     * Moves the elevator down
+     */
+    public void moveDown() {
+        driveOut.Output = -1*VELOCITYFACTOR;
         motor.setControl(driveOut);
     }
 
-    public void L1() {
-        tStart = Timer.getTimestamp();
-        targetPos = L1;
-        posName = "L1";
+    /**
+     * Moves the elevator up
+     */
+    public void moveUp(){
+        driveOut.Output = 1*VELOCITYFACTOR;
+        motor.setControl(driveOut);
     }
 
-    public void L2() {
-        tStart = Timer.getTimestamp();
-        targetPos = L2;
-        posName = "L2";
-    }
+    // public void L1() {
+    //     tStart = Timer.getTimestamp();
+    //     targetPos = L1;
+    //     posName = "L1";
+    // }
 
-    public void L3() {
-        tStart = Timer.getTimestamp();
-        targetPos = L3;
-        posName = "L3";
-    }
+    // public void L2() {
+    //     tStart = Timer.getTimestamp();
+    //     targetPos = L2;
+    //     posName = "L2";
+    // }
+
+    // public void L3() {
+    //     tStart = Timer.getTimestamp();
+    //     targetPos = L3;
+    //     posName = "L3";
+    // }
 
     /**
      * DO NOT USE: RISK OF MOTOR BURNOUT

@@ -174,8 +174,8 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     // driver code
-    throttle = joystickDeadband(-(driver.getLeftY()) * Math.abs(driver.getLeftY()));
-    steer = 0.5 * joystickDeadband(driver.getRightX() * Math.abs(driver.getRightX()));
+    throttle = 0.35*joystickDeadband(-(driver.getLeftY()) * Math.abs(driver.getLeftY()));
+    steer = 0.35 * joystickDeadband(driver.getRightX() * Math.abs(driver.getRightX()));
     // Inverse bot's controller directions
     if (inversed) {
       throttle *= -1;
@@ -229,23 +229,15 @@ public class Robot extends TimedRobot {
     SmartDashboard.putBoolean("Arm Stowed", algaeArm.getStowed());
     algaeArm.runArm();
 
+    
     // elevator
     if (operator.getPOV() == 0)
-      elevator.L1();
-    if (operator.getPOV() == 90)
-      elevator.L2();
+      elevator.moveUp();
     if (operator.getPOV() == 180)
-      elevator.L3();
-    elevator.run();
-    SmartDashboard.putString("Elevator Level", elevator.posName);
-    SmartDashboard.putNumber("TIME LEFT",
-        (Timer.getTimestamp() - elevator.tStart < Elevator.TIMELIMIT) ? 6 + elevator.tStart - Timer.getTimestamp() : 0);
-
-        // backup elevator version
-    // if (operator.getBackButtonPressed()) elevator.L1();
-    // if (operator.getStartButtonPressed()) elevator.L2();
-    // if (operator.getBackButtonPressed() && operator.getStartButtonPressed())
-    // elevator.L3();
+      elevator.moveDown();
+    //elevator.run();
+    //SmartDashboard.putString("Elevator Level", elevator.posName);
+    //SmartDashboard.putNumber("TIME LEFT",(Timer.getTimestamp() - elevator.tStart < Elevator.TIMELIMIT) ? 6 + elevator.tStart - Timer.getTimestamp() : 0);
 
     // // coral intake
     if (operator.getRightBumperButton()) {
@@ -263,33 +255,30 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledInit() {
     drivetrain.setMode(IdleMode.kCoast);
-    elevator.down();
+    elevator.moveDown();
   }
 
-  /** This function is called periodically when disabled. */
-  @Override
-  public void disabledPeriodic() {
-  }
+  
 
   /** This function is called once when test mode is enabled. */
-  @Override
-  public void testInit() {
-    drivetrain.setMode(IdleMode.kBrake);
-  }
+  // @Override
+  // public void testInit() {
+  //   drivetrain.setMode(IdleMode.kBrake);
+  // }
 
   /** This function is called periodically during test mode. */
-  @Override
-  public void testPeriodic() {
-  }
+  // @Override
+  // public void testPeriodic() {
+  // }
 
   /** This function is called once when the robot is first started up. */
-  @Override
-  public void simulationInit() {
-    drivetrain.setMode(IdleMode.kBrake);
-  }
+  // @Override
+  // public void simulationInit() {
+  //   drivetrain.setMode(IdleMode.kBrake);
+  // }
 
   /** This function is called periodically whilst in simulation. */
-  @Override
-  public void simulationPeriodic() {
-  }
+  // @Override
+  // public void simulationPeriodic() {
+  // }
 }
