@@ -43,7 +43,7 @@ public class Elevator {
     private TalonFX motorFollower  =  new TalonFX(21); // RIGHT SIDE
     private DutyCycleOut driveOut = new DutyCycleOut(0);
     private PositionVoltage posVolt = new PositionVoltage(0).withSlot(0); 
-    //private final StatusSignal<Double> motorVelocityObject;
+    //private final StatusSignal<Double> motorVelocityObject;//used by the stall checker
 
 
     private double targetPos = 0;
@@ -66,7 +66,7 @@ public class Elevator {
         motor.getConfigurator().apply(config);
         motorFollower.getConfigurator().apply(config);
 
-        //motorVelocityObject = motor.getRotorVelocity();
+        //motorVelocityObject = motor.getRotorVelocity();//used by the stall checker 
 
         motorFollower.setControl(new Follower(motor.getDeviceID(), true));
     }
@@ -79,21 +79,18 @@ public class Elevator {
     /**
      * Old run() code
      */
-    // public void run() {
-    //     if(Timer.getTimestamp() - tStart > TIMELIMIT) {;
-
-    //         if(motor.getPosition().getStatus().value <= 1) {
-    //             driveOut.Output = 0;
-    //             motor.setControl(driveOut);
-    //             return;
-    //         }
-
-    //         motor.setControl(posVolt.withPosition(1));
-    //         return;
-    //     }
-        
-    //     //motor.setControl(posVolt.withPosition(targetPos));
-    // } 
+    public void run() {
+        if(Timer.getTimestamp() - tStart > TIMELIMIT) {;
+            if(motor.getPosition().getStatus().value <= 1) {
+                driveOut.Output = 0;
+                motor.setControl(driveOut);
+                return;
+            }
+            motor.setControl(posVolt.withPosition(1));
+            return;
+        }
+        //motor.setControl(posVolt.withPosition(targetPos));
+    } 
 
 
 
@@ -139,6 +136,7 @@ public class Elevator {
 
     /**
      * determine is the motor is stalling based on the rotor velocity
+     * currently non functional due to library import errors
      * @return wether the motor is stalling
      */
     public boolean isMotorStalled(){
