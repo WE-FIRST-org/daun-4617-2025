@@ -120,19 +120,27 @@ public class Elevator {
             motor.setControl(driveOut);
         }
     }
-
+    /**
+     * Moves the elevator to the inital Position
+     */
     public void intialPos(){
         while(!isMotorStalled()){
             driveOut.Output = -1*0.05;
             motor.setControl(driveOut);
         }
     }
-
+    /**
+     * Pause the movement for the elevator
+     */
     public void movePause(){
         driveOut.Output = 0;
         motor.setControl(driveOut);
     }
 
+    /**
+     * determine is the motor is stalling based on the rotor velocity
+     * @return wether the motor is stalling
+     */
     public boolean isMotorStalled(){
         // double velocity = motorVelocityObject.getValueAsDouble();
         // if(Math.abs(velocity) <0.05){
