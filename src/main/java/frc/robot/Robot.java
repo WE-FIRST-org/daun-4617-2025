@@ -235,6 +235,9 @@ public class Robot extends TimedRobot {
       elevator.moveUp();
     if (operator.getPOV() == 180)
       elevator.moveDown();
+    if(operator.getPOV() == -1){
+      elevator.movePause();
+    }
     //elevator.run();
     //SmartDashboard.putString("Elevator Level", elevator.posName);
     //SmartDashboard.putNumber("TIME LEFT",(Timer.getTimestamp() - elevator.tStart < Elevator.TIMELIMIT) ? 6 + elevator.tStart - Timer.getTimestamp() : 0);
@@ -255,7 +258,6 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledInit() {
     drivetrain.setMode(IdleMode.kCoast);
-    elevator.moveDown();
   }
 
   

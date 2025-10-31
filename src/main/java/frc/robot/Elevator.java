@@ -20,6 +20,7 @@ import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.BaseStatusSignal;
 // teleop imports
 import com.revrobotics.RelativeEncoder;
 
@@ -30,7 +31,7 @@ public class Elevator {
     public static final double MAXPOWER = 0.4; //change to 0.3
     public static final double MAXHEIGHT = 1; // NVM This variable is not used anywhere
     public static final double TIMELIMIT = 2; // TO DO
-    public static final double VELOCITYFACTOR = 0.4; // this factor affects how much speed does the motor move
+    public static final double VELOCITYFACTOR = 0.09; // this factor affects how much speed does the motor move, do not go higher than 0.2
     private static final double P = 1.2;
     private static final double I = 0;
     private static final double D = 0;
@@ -42,6 +43,8 @@ public class Elevator {
     private TalonFX motorFollower  =  new TalonFX(21); // RIGHT SIDE
     private DutyCycleOut driveOut = new DutyCycleOut(0);
     private PositionVoltage posVolt = new PositionVoltage(0).withSlot(0); 
+    //private final StatusSignal<Double> motorVelocityObject;
+
 
     private double targetPos = 0;
     private Timer burnoutTimer = new Timer();
@@ -62,6 +65,8 @@ public class Elevator {
 
         motor.getConfigurator().apply(config);
         motorFollower.getConfigurator().apply(config);
+
+        //motorVelocityObject = motor.getRotorVelocity();
 
         motorFollower.setControl(new Follower(motor.getDeviceID(), true));
     }
@@ -96,16 +101,44 @@ public class Elevator {
      * Moves the elevator down
      */
     public void moveDown() {
-        driveOut.Output = -1*VELOCITYFACTOR;
-        motor.setControl(driveOut);
+        if(isMotorStalled()){
+            movePause();
+        } else{
+            driveOut.Output = -1*VELOCITYFACTOR;
+            motor.setControl(driveOut);
+        }
     }
 
     /**
      * Moves the elevator up
      */
     public void moveUp(){
-        driveOut.Output = 1*VELOCITYFACTOR;
+        if(isMotorStalled()){
+            movePause();
+        }else{
+            driveOut.Output = 1*VELOCITYFACTOR;
+            motor.setControl(driveOut);
+        }
+    }
+
+    public void intialPos(){
+        while(!isMotorStalled()){
+            driveOut.Output = -1*0.05;
+            motor.setControl(driveOut);
+        }
+    }
+
+    public void movePause(){
+        driveOut.Output = 0;
         motor.setControl(driveOut);
+    }
+
+    public boolean isMotorStalled(){
+        // double velocity = motorVelocityObject.getValueAsDouble();
+        // if(Math.abs(velocity) <0.05){
+        //     return true;
+        // }
+        return false;
     }
 
     // public void L1() {
