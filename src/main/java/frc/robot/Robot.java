@@ -260,7 +260,10 @@ public class Robot extends TimedRobot {
     drivetrain.setMode(IdleMode.kCoast);
   }
 
-  
+  @Override
+  public void disabledPeriodic(){
+    
+  }
 
   /** This function is called once when test mode is enabled. */
   @Override
