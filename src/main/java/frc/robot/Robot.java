@@ -174,8 +174,8 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     // driver code
-    throttle = 0.35*joystickDeadband(-(driver.getLeftY()) * Math.abs(driver.getLeftY()));
-    steer = 0.35 * joystickDeadband(driver.getRightX() * Math.abs(driver.getRightX()));
+    throttle = 0.4*joystickDeadband(-(driver.getLeftY()) * Math.abs(driver.getLeftY()));
+    steer = 0.20 * joystickDeadband(driver.getRightX() * Math.abs(driver.getRightX()));
     // Inverse bot's controller directions
     if (inversed) {
       throttle *= -1;
